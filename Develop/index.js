@@ -32,6 +32,30 @@ function writeToFile(fileName, data) {
   console.log(`SVG file created at ${filePath}`);
 }
 
+function generateSvgContent(title, textColor, shape, shapeFillColor) {
+  const shapeElements = shape
+    .map((selectedShape) => {
+      switch (selectedShape) {
+        case "circle":
+          return `<circle cx="50" cy="50" r="40" fill="${shapeFillColor}" />`;
+        case "rectangle":
+          return `<rect x="10" y="10" width="80" height="80" fill="${shapeFillColor}" />`;
+        case "triangle":
+          return `<polygon points="50,10 90,90 10,90" fill="${shapeFillColor}" />`;
+        default:
+          return "";
+      }
+    })
+    .join("");
+
+  const svgContent = `<svg width="100" height="100">
+    ${shapeElements}
+    <text x="50%" y="50%" fill="${textColor}" text-anchor="middle" dominant-baseline="middle">${title}</text>
+  </svg>`;
+
+  return svgContent;
+}
+
 function init() {
   inquirer
     .prompt(questions)
@@ -39,28 +63,15 @@ function init() {
       const { title, textColor, shape, shapeFillColor } = answers;
 
       // Generate SVG content based on user choices
-      const shapeElements = shape
-        .map((selectedShape) => {
-          switch (selectedShape) {
-            case "circle":
-              return `<circle cx="50" cy="50" r="40" fill="${shapeFillColor}" />`;
-            case "rectangle":
-              return `<rect x="10" y="10" width="80" height="80" fill="${shapeFillColor}" />`;
-            case "triangle":
-              return `<polygon points="50,10 90,90 10,90" fill="${shapeFillColor}" />`;
-            default:
-              return "";
-          }
-        })
-        .join("");
-
-      const svgContent = `<svg width="100" height="100">
-            ${shapeElements}
-            <text x="50%" y="50%" fill="${textColor}" text-anchor="middle" dominant-baseline="middle">${title}</text>
-          </svg>`;
+      const svgContent = generateSvgContent(
+        title,
+        textColor,
+        shape,
+        shapeFillColor
+      );
 
       // Call writeToFile function with the desired file name and SVG content
-      writeToFile("logo.svg", svgContent, (err) => {});
+      writeToFile("logo.svg", svgContent);
       console.log("Generated logo.svg");
     })
     .catch((error) => {
